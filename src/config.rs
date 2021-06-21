@@ -34,6 +34,7 @@ pub struct BotApplicationConfig {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DatabaseConfig {
     pub url: String,
+    pub redis_url: String
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

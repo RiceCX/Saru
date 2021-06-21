@@ -8,8 +8,8 @@ use serenity::{
 
 #[command]
 #[description = "Shows various information about the current guild."]
-async fn test(context: &Context, message: &Message) -> CommandResult {
-    message.reply(&context.http, "shut up nigger").await.expect("Could not send message");
+async fn guild(context: &Context, message: &Message) -> CommandResult {
+    message.reply(&context.http, "shut up").await.expect("Could not send message");
 
     Ok(())
 }

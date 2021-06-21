@@ -27,9 +27,13 @@ features = ["json", "multipart", "stream", "rustls-tls"]
 [dependencies.serenity]
 version = "0.10.8"
 default-features = true
-features = ["collector", "unstable_discord_api", "rustls_backend", "model"]
+features = ["collector", "unstable_discord_api", "rustls_backend", "model", "voice"]
 
 [dependencies.sqlx]
 git = "https://github.com/launchbadge/sqlx"
 default-features = false
 features = ["runtime-tokio-rustls", "macros", "postgres", "uuid", "chrono"]
+
+[dependencies.redis]
+version = "0.20.1"
+features = ["tokio-comp"]

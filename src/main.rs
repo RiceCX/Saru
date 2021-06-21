@@ -22,15 +22,30 @@ mod utils;
 mod data;
 mod listeners;
 mod commands;
+mod checks;
 
 use commands::{
-    info::{test::*}
+    info::{guild::*},
+    moderation::{action::*},
+    developer::{test::*},
+    utils::{help::*}
 };
 
 #[group("Info")]
 #[description = "Informational commands that provide useful information."]
-#[commands(test)]
+#[commands(test, guild)]
 struct Info;
+
+
+#[group("Developer")]
+#[description = "Commands that are used during the development of this bot."]
+#[commands(test)]
+struct Developer;
+
+#[group("Moderation")]
+#[description = "Commands that are used by staff."]
+#[commands(action)]
+struct Moderation;
 
 #[tokio::main(worker_threads = 16)]
 #[instrument]
@@ -98,7 +113,10 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>>{
         .after(after)
         .prefix_only(prefix_only)
         .on_dispatch_error(dispatch_error)
-        .group(&INFO_GROUP);
+        .help(&HELP)
+        .group(&INFO_GROUP)
+        .group(&DEVELOPER_GROUP)
+        .group(&MODERATION_GROUP);
 
     let mut client = ClientBuilder::new(&token)
         .event_handler(Handler)
@@ -113,12 +131,16 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>>{
         let http_client = Client::builder().user_agent(REQWEST_USER_AGENT).redirect(Policy::none()).build()?;
 
         let url = config.database.url;
+        let redis_url = config.database.redis_url;
         let pool = PgPoolOptions::new().max_connections(20).connect(&url).await?;
+        let redis_pool = redis::Client::open(redis_url)?;
+        let redis_connection = redis_pool.get_connection().unwrap();
 
         data.insert::<ConfigContainer>(read_config("configuration.yml"));
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
         data.insert::<ReqwestContainer>(http_client);
         data.insert::<DatabasePool>(pool);
+        data.insert::<RedisPool>(redis_connection);
         data.insert::<UptimeContainer>(Utc::now());
 
     }
